@@ -1,5 +1,4 @@
 use core::fmt;
-use std::fmt::Error;
 
 pub struct Bitreader<'a> {
     buffer: &'a [u8],
@@ -16,16 +15,14 @@ impl<'a> Bitreader<'a> {
         }
     }
 
-    fn read_bits(&mut self) -> Result {
+    fn read_bits(&mut self, size: u8) -> Result {
         let mut value: u8 = 0;
         let start_pos = self.position;
-        let end_pos = start_pos + 8;
+        let end_pos = start_pos + size as u64;
 
-        if (end_pos > self.length) {
-            BitReadError()
+        if end_pos > self.length {
+            return Err(BitReadBufferExceeded)
         }
-
-        println!("start_pos : {}\nend_pos : {}", start_pos, end_pos);
 
         for i in start_pos..end_pos{
             let index = (i / 8) as usize;
@@ -43,14 +40,14 @@ impl<'a> Bitreader<'a> {
 
 }
 
-type Result = std::result::Result<u8, BitReadError>;
+type Result = std::result::Result<u8, BitReadBufferExceeded>;
 
 #[derive(Debug, Clone, PartialEq)]
-struct BitReadError;
+struct BitReadBufferExceeded;
 
-impl fmt::Display for BitReadError {
+impl fmt::Display for BitReadBufferExceeded {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "Unable to read bits")
+        write!(f, "Unable to read bits, read size exceeds remaining buffer length.")
     }
 }
 
@@ -65,7 +62,7 @@ mod tests {
         let input: &[u8] = &[10];
         let mut bitreader = Bitreader::new(input);
 
-        let result = bitreader.read_bits().unwrap();
+        let result = bitreader.read_bits(8).unwrap();
         assert_eq!(result, 10)
     }
 
@@ -74,16 +71,13 @@ mod tests {
         let input: &[u8] = &[10, 20, 30];
         let mut bitreader = Bitreader::new(input);
 
-        let result = bitreader.read_bits().unwrap();
-        println!("{}", result);
+        let result = bitreader.read_bits(8).unwrap();
         assert_eq!(result, 10);
 
-        let result = bitreader.read_bits().unwrap();
-        println!("{}", result);
+        let result = bitreader.read_bits(8).unwrap();
         assert_eq!(result, 20);
 
-        let result = bitreader.read_bits().unwrap();
-        println!("{}", result);
+        let result = bitreader.read_bits(8).unwrap();
         assert_eq!(result, 30)
     }
 
@@ -92,7 +86,7 @@ mod tests {
         let input: &[u8] = &[10];
         let mut bitreader = Bitreader::new(input);
 
-        let result = bitreader.read_bits().err().unwrap();
-        assert_eq!(result, BitReadError)
+        let result = bitreader.read_bits(16);
+        assert_eq!(result, Err(BitReadBufferExceeded))
     }
 }
