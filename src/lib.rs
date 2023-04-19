@@ -42,9 +42,9 @@ impl<'a> Bitreader<'a> {
         Ok(value)
     }
 
-    fn read_string(&mut self, byte_size: u8) -> Result<&str> {
+    pub fn read_string(&mut self, byte_size: u8) -> Result<String> {
         let mut bytes: Vec<u8> = vec![];
-        for bit_size in 0..byte_size * 8 {
+        for _ in 0..byte_size {
             let byte = match self.read_bits(8) {
                 Ok(v) => v,
                 Err(e) => return Err(e),
@@ -53,8 +53,8 @@ impl<'a> Bitreader<'a> {
             bytes.push(byte)
         }
 
-        match str::from_utf8(bytes.as_slice()) {
-            Ok(v) => Ok(v.clone()),
+        match String::from_utf8(bytes) {
+            Ok(v) => Ok(v),
             Err(e) => return Err(errors::BitReadBufferExceeded)
         }
     }
@@ -96,5 +96,15 @@ mod tests {
 
         let result = bitreader.read_bits(16);
         assert_eq!(result, Err(errors::BitReadBufferExceeded))
+    }
+
+    #[test]
+    fn read_string() {
+        let input = &[72, 101, 108, 108, 111, 44, 32, 87, 111, 114, 108, 100, 33];
+        let mut bitreader = Bitreader::new(input);
+        
+        let result = bitreader.read_string(13);
+        let expected = Ok(String::from("Hello, World!"));
+        assert_eq!(result, expected)
     }
 }
