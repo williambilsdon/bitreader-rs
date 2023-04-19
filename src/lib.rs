@@ -1,8 +1,6 @@
-use std::str;
-
 mod errors;
 
-type Result<T> = std::result::Result<T, errors::BitReadBufferExceeded>;
+type Result<T> = std::result::Result<T, errors::BitreadError>;
 
 pub struct Bitreader<'a> {
     buffer: &'a [u8],
@@ -25,7 +23,7 @@ impl<'a> Bitreader<'a> {
         let end_pos = start_pos + size as u64;
 
         if end_pos > self.length {
-            return Err(errors::BitReadBufferExceeded)
+            return Err(errors::BitreadError::BitReadBufferExceeded)
         }
 
         for i in start_pos..end_pos{
@@ -55,7 +53,7 @@ impl<'a> Bitreader<'a> {
 
         match String::from_utf8(bytes) {
             Ok(v) => Ok(v),
-            Err(e) => return Err(errors::BitReadBufferExceeded)
+            Err(e) => return Err(errors::BitreadError::ParseToStringError)
         }
     }
 
@@ -95,7 +93,7 @@ mod tests {
         let mut bitreader = Bitreader::new(input);
 
         let result = bitreader.read_bits(16);
-        assert_eq!(result, Err(errors::BitReadBufferExceeded))
+        assert_eq!(result, Err(errors::BitreadError::BitReadBufferExceeded))
     }
 
     #[test]
