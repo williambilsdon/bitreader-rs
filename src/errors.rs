@@ -1,7 +1,5 @@
 use core::fmt;
 
-pub type Result = std::result::Result<u8, BitReadBufferExceeded>;
-
 #[derive(Debug, Clone, PartialEq)]
 pub struct BitReadBufferExceeded;
 

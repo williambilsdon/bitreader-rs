@@ -1,4 +1,8 @@
+use std::str;
+
 mod errors;
+
+type Result<T> = std::result::Result<T, errors::BitReadBufferExceeded>;
 
 pub struct Bitreader<'a> {
     buffer: &'a [u8],
@@ -15,7 +19,7 @@ impl<'a> Bitreader<'a> {
         }
     }
 
-    fn read_bits(&mut self, size: u8) -> errors::Result {
+    fn read_bits(&mut self, size: u8) -> Result<u8> {
         let mut value: u8 = 0;
         let start_pos = self.position;
         let end_pos = start_pos + size as u64;
@@ -36,6 +40,23 @@ impl<'a> Bitreader<'a> {
         self.position = end_pos;
 
         Ok(value)
+    }
+
+    fn read_string(&mut self, byte_size: u8) -> Result<&str> {
+        let mut bytes: Vec<u8> = vec![];
+        for bit_size in 0..byte_size * 8 {
+            let byte = match self.read_bits(8) {
+                Ok(v) => v,
+                Err(e) => return Err(e),
+            };
+            
+            bytes.push(byte)
+        }
+
+        match str::from_utf8(bytes.as_slice()) {
+            Ok(v) => Ok(v.clone()),
+            Err(e) => return Err(errors::BitReadBufferExceeded)
+        }
     }
 
 }
