@@ -1,4 +1,4 @@
-use core::fmt;
+mod errors;
 
 pub struct Bitreader<'a> {
     buffer: &'a [u8],
@@ -15,13 +15,13 @@ impl<'a> Bitreader<'a> {
         }
     }
 
-    fn read_bits(&mut self, size: u8) -> Result {
+    fn read_bits(&mut self, size: u8) -> errors::Result {
         let mut value: u8 = 0;
         let start_pos = self.position;
         let end_pos = start_pos + size as u64;
 
         if end_pos > self.length {
-            return Err(BitReadBufferExceeded)
+            return Err(errors::BitReadBufferExceeded)
         }
 
         for i in start_pos..end_pos{
@@ -40,21 +40,8 @@ impl<'a> Bitreader<'a> {
 
 }
 
-type Result = std::result::Result<u8, BitReadBufferExceeded>;
-
-#[derive(Debug, Clone, PartialEq)]
-struct BitReadBufferExceeded;
-
-impl fmt::Display for BitReadBufferExceeded {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "Unable to read bits, read size exceeds remaining buffer length.")
-    }
-}
-
 #[cfg(test)]
 mod tests {
-    use std::result;
-
     use super::*;
 
     #[test]
@@ -87,6 +74,6 @@ mod tests {
         let mut bitreader = Bitreader::new(input);
 
         let result = bitreader.read_bits(16);
-        assert_eq!(result, Err(BitReadBufferExceeded))
+        assert_eq!(result, Err(errors::BitReadBufferExceeded))
     }
 }
