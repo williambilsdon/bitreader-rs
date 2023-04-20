@@ -43,10 +43,7 @@ impl<'a> Bitreader<'a> {
     pub fn read_string(&mut self, byte_size: u8) -> Result<String> {
         let mut bytes: Vec<u8> = vec![];
         for _ in 0..byte_size {
-            let byte = match self.read_bits(8) {
-                Ok(v) => v,
-                Err(e) => return Err(e),
-            };
+            let byte = self.read_bits(8)?;
             
             bytes.push(byte)
         }
@@ -55,6 +52,26 @@ impl<'a> Bitreader<'a> {
             Ok(v) => Ok(v),
             Err(e) => return Err(errors::BitreadError::ParseToStringError)
         }
+    }
+
+    pub fn read_u8(&mut self) -> Result<u8> {
+        let value = self.read_bits(8)?;
+        Ok(value)
+    }
+
+    pub fn read_u16(&mut self) -> Result<u16> {
+        let value = self.read_bits(16)?;
+        Ok(value as u16)
+    }
+
+    pub fn read_u32(&mut self) -> Result<u32> {
+        let value = self.read_bits(32)?;
+        Ok(value as u32)
+    }
+
+    pub fn read_u64(&mut self) -> Result<u64> {
+        let value = self.read_bits(64)?;
+        Ok(value as u64)
     }
 
 }
@@ -104,5 +121,45 @@ mod tests {
         let result = bitreader.read_string(13);
         let expected = Ok(String::from("Hello, World!"));
         assert_eq!(result, expected)
+    }
+
+    #[test]
+    fn read_u8() {
+        let input = &[255];
+        let mut bitreader = Bitreader::new(input);
+
+        let result = bitreader.read_u8();
+        let expected: Result<u8> = Ok(255);
+        assert_eq!(result, expected) 
+    }
+
+    #[test]
+    fn read_u16() {
+        let input = &[255];
+        let mut bitreader = Bitreader::new(input);
+
+        let result = bitreader.read_u8();
+        let expected: Result<u8> = Ok(255);
+        assert_eq!(result, expected) 
+    }
+
+    #[test]
+    fn read_u32() {
+        let input = &[255];
+        let mut bitreader = Bitreader::new(input);
+
+        let result = bitreader.read_u8();
+        let expected: Result<u8> = Ok(255);
+        assert_eq!(result, expected) 
+    }
+
+    #[test]
+    fn read_u64() {
+        let input = &[255];
+        let mut bitreader = Bitreader::new(input);
+
+        let result = bitreader.read_u8();
+        let expected: Result<u8> = Ok(255);
+        assert_eq!(result, expected) 
     }
 }
