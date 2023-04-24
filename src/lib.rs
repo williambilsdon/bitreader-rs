@@ -23,7 +23,7 @@ impl<'a> Bitreader<'a> {
         let end_pos = start_pos + size as u64;
 
         if end_pos > self.length {
-            return Err(errors::BitreadError::BitReadBufferExceeded)
+            return Err(errors::BitreadError::BufferExceeded)
         }
 
         for i in start_pos..end_pos{
@@ -50,7 +50,7 @@ impl<'a> Bitreader<'a> {
 
         match String::from_utf8(bytes) {
             Ok(v) => Ok(v),
-            Err(e) => return Err(errors::BitreadError::ParseToStringError)
+            Err(_) => return Err(errors::BitreadError::ParseToStringError)
         }
     }
 
@@ -72,6 +72,22 @@ impl<'a> Bitreader<'a> {
     pub fn read_u64(&mut self) -> Result<u64> {
         let value = self.read_bits(64)?;
         Ok(value as u64)
+    }
+
+    pub fn skip_bits(&mut self, num_bits: u8) -> Result<()> {
+        let new_pos = self.position + (num_bits as u64);
+        if new_pos > self.length {
+            return Err(errors::BitreadError::BufferExceeded)
+        }
+
+        self.position = new_pos;
+        
+        Ok(())
+    }
+
+    pub fn read_f32(&mut self) -> Result<f32> {
+        let value = self.read_u32()?;
+        Ok(value as f32)
     }
 
 }
@@ -110,7 +126,7 @@ mod tests {
         let mut bitreader = Bitreader::new(input);
 
         let result = bitreader.read_bits(16);
-        assert_eq!(result, Err(errors::BitreadError::BitReadBufferExceeded))
+        assert_eq!(result, Err(errors::BitreadError::BufferExceeded))
     }
 
     #[test]
@@ -162,4 +178,33 @@ mod tests {
         let expected: Result<u8> = Ok(255);
         assert_eq!(result, expected) 
     }
+
+    #[test]
+    fn skip_bits() {
+        let input = &[72, 101, 108, 108, 111];
+        let mut bitreader = Bitreader::new(input);
+
+        let result = bitreader.skip_bits(16);
+        assert_eq!(result, Ok(()));
+        let expected: u64 = 16;
+        assert_eq!(bitreader.position, expected)
+    }
+
+    #[test]
+    fn read_f32() {
+        let input = &[51, 46, 49, 52, 50, 56, 55, 48, 48, 48,
+         48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48];
+        let mut bitreader = Bitreader::new(input);
+
+        let result = bitreader.read_f32();
+        let expected: Result<f32> = Ok(52.0);
+        assert_eq!(result, expected) 
+    }
+    
+    #[test]
+    fn read_f64() {
+        todo!()
+    }
+
+
 }
