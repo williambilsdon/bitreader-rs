@@ -141,7 +141,7 @@ mod tests {
 
     #[test]
     fn read_u8() {
-        let input = &[255];
+        let input = &[0b11111111];
         let mut bitreader = Bitreader::new(input);
 
         let result = bitreader.read_u8();
@@ -151,31 +151,31 @@ mod tests {
 
     #[test]
     fn read_u16() {
-        let input = &[255];
+        let input = &[0b11111111, 0b11111111];
         let mut bitreader = Bitreader::new(input);
 
-        let result = bitreader.read_u8();
-        let expected: Result<u8> = Ok(255);
+        let result = bitreader.read_u16();
+        let expected: Result<u16> = Ok(65535);
         assert_eq!(result, expected) 
     }
 
     #[test]
     fn read_u32() {
-        let input = &[255];
+        let input = &[0b11111111, 0b11111111, 0b11111111];
         let mut bitreader = Bitreader::new(input);
 
-        let result = bitreader.read_u8();
-        let expected: Result<u8> = Ok(255);
+        let result = bitreader.read_u32();
+        let expected: Result<u32> = Ok(2147483647);
         assert_eq!(result, expected) 
     }
 
     #[test]
     fn read_u64() {
-        let input = &[255];
+        let input = &[0b11111111, 0b11111111, 0b11111111, 0b11111111];
         let mut bitreader = Bitreader::new(input);
 
-        let result = bitreader.read_u8();
-        let expected: Result<u8> = Ok(255);
+        let result = bitreader.read_u64();
+        let expected: Result<u64> = Ok(9223372036854775807);
         assert_eq!(result, expected) 
     }
 
@@ -192,8 +192,7 @@ mod tests {
 
     #[test]
     fn read_f32() {
-        let input = &[51, 46, 49, 52, 50, 56, 55, 48, 48, 48,
-         48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48];
+        let input = &[0b110100, 0b00000000, 0b00000000];
         let mut bitreader = Bitreader::new(input);
 
         let result = bitreader.read_f32();
@@ -202,6 +201,7 @@ mod tests {
     }
     
     #[test]
+    #[ignore = "f64 isn't required right now so not implemented"]
     fn read_f64() {
         todo!()
     }
