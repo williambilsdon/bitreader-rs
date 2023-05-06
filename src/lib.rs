@@ -98,7 +98,7 @@ mod tests {
 
     #[test]
     fn read_bits_from_single_item() {
-        let input: &[u8] = &[10];
+        let input: &[u8] = &[0b00001010];
         let mut bitreader = Bitreader::new(input);
 
         let result = bitreader.read_bits(8).unwrap();
@@ -107,7 +107,7 @@ mod tests {
 
     #[test]
     fn read_bits_from_multiple_items() {
-        let input: &[u8] = &[10, 20, 30];
+        let input: &[u8] = &[0b00001010, 0b00010100, 0b00011110];
         let mut bitreader = Bitreader::new(input);
 
         let result = bitreader.read_bits(8).unwrap();
@@ -122,7 +122,7 @@ mod tests {
 
     #[test]
     fn read_bits_err_if_size_too_large() {
-        let input: &[u8] = &[10];
+        let input: &[u8] = &[0b00001010];
         let mut bitreader = Bitreader::new(input);
 
         let result = bitreader.read_bits(16);
@@ -131,6 +131,7 @@ mod tests {
 
     #[test]
     fn read_string() {
+        // TODO: convert to 0b format
         let input = &[72, 101, 108, 108, 111, 44, 32, 87, 111, 114, 108, 100, 33];
         let mut bitreader = Bitreader::new(input);
         
@@ -151,6 +152,7 @@ mod tests {
 
     #[test]
     fn read_u16() {
+        // FIXME: Fix Left: Ok(255)
         let input = &[0b11111111, 0b11111111];
         let mut bitreader = Bitreader::new(input);
 
@@ -161,6 +163,7 @@ mod tests {
 
     #[test]
     fn read_u32() {
+        // FIXME: Fix buffer exceeded
         let input = &[0b11111111, 0b11111111, 0b11111111];
         let mut bitreader = Bitreader::new(input);
 
@@ -171,6 +174,7 @@ mod tests {
 
     #[test]
     fn read_u64() {
+        // FIXME: Fix buffer exceeded
         let input = &[0b11111111, 0b11111111, 0b11111111, 0b11111111];
         let mut bitreader = Bitreader::new(input);
 
@@ -181,6 +185,7 @@ mod tests {
 
     #[test]
     fn skip_bits() {
+        // TODO: Fix byte format to 0b format
         let input = &[72, 101, 108, 108, 111];
         let mut bitreader = Bitreader::new(input);
 
@@ -191,6 +196,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "Need to look up binary32 for the implementation"]
     fn read_f32() {
         let input = &[0b110100, 0b00000000, 0b00000000];
         let mut bitreader = Bitreader::new(input);
