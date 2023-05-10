@@ -5,7 +5,7 @@ type Result<T> = std::result::Result<T, errors::BitreadError>;
 pub struct Bitreader<'a> {
     buffer: &'a [u8],
     position: u64,
-    length: u64,
+    pub length: u64,
 }
 
 impl<'a> Bitreader<'a> {
@@ -17,8 +17,10 @@ impl<'a> Bitreader<'a> {
         }
     }
 
-    fn read_bits(&mut self, size: u8) -> Result<u8> {
-        let mut value: u8 = 0;
+    // There might not be a shared trait between nums can either use an enum (more fun) or use a u64
+    // and convert in support functions (read_u8) with value as u8
+    fn read_bits<T>(&mut self, size: u8) -> Result<T> {
+        let mut value: T = 0;
         let start_pos = self.position;
         let end_pos = start_pos + size as u64;
 
@@ -131,8 +133,9 @@ mod tests {
 
     #[test]
     fn read_string() {
-        // TODO: convert to 0b format
-        let input = &[72, 101, 108, 108, 111, 44, 32, 87, 111, 114, 108, 100, 33];
+        let input = &[0b01001000, 0b01100101, 0b01101100, 0b01101100,
+            0b01101111, 0b00101100, 0b00100000, 0b01010111, 0b01101111,
+            0b01110010, 0b01101100, 0b01100100, 0b00100001 ];
         let mut bitreader = Bitreader::new(input);
         
         let result = bitreader.read_string(13);
@@ -163,10 +166,10 @@ mod tests {
 
     #[test]
     fn read_u32() {
-        // FIXME: Fix buffer exceeded
-        let input = &[0b11111111, 0b11111111, 0b11111111];
+        // FIXME: Fix Left: Ok(255)
+        let input = &[0b11111111, 0b11111111, 0b11111111, 0b11111111];
         let mut bitreader = Bitreader::new(input);
-
+        println!("{}", bitreader.length);
         let result = bitreader.read_u32();
         let expected: Result<u32> = Ok(2147483647);
         assert_eq!(result, expected) 
@@ -174,8 +177,8 @@ mod tests {
 
     #[test]
     fn read_u64() {
-        // FIXME: Fix buffer exceeded
-        let input = &[0b11111111, 0b11111111, 0b11111111, 0b11111111];
+        // FIXME: Fix Left: Ok(255)
+        let input = &[0b11111111, 0b11111111, 0b11111111, 0b11111111, 0b11111111, 0b11111111, 0b11111111, 0b11111111];
         let mut bitreader = Bitreader::new(input);
 
         let result = bitreader.read_u64();
@@ -185,8 +188,7 @@ mod tests {
 
     #[test]
     fn skip_bits() {
-        // TODO: Fix byte format to 0b format
-        let input = &[72, 101, 108, 108, 111];
+        let input = &[0b11111111, 0b11111111, 0b11111111, 0b11111111];
         let mut bitreader = Bitreader::new(input);
 
         let result = bitreader.skip_bits(16);
