@@ -17,10 +17,9 @@ impl<'a> Bitreader<'a> {
         }
     }
 
-    // There might not be a shared trait between nums can either use an enum (more fun) or use a u64
-    // and convert in support functions (read_u8) with value as u8
-    fn read_bits<T>(&mut self, size: u8) -> Result<T> {
-        let mut value: T = 0;
+    // Maybe convert to enum of nums
+    fn read_bits(&mut self, size: u8) -> Result<u64> {
+        let mut value: u64 = 0;
         let start_pos = self.position;
         let end_pos = start_pos + size as u64;
 
@@ -32,7 +31,7 @@ impl<'a> Bitreader<'a> {
             let index = (i / 8) as usize;
             let byte = self.buffer[index]; // 10
             let shift = 7 - (i % 8); // 0
-            let bit = (byte >> shift) & 1; // 0001 0100 >> 0 = 0001 0100 & 1 = 0000 0000 
+            let bit = (byte >> shift) as u64 & 1; // 0001 0100 >> 0 = 0001 0100 & 1 = 0000 0000 
 
             value = (value << 1) | bit; // 0000 1010 << 1 = 0001 0100 | 0000 0000  = 0001 0100 
         }
@@ -47,7 +46,7 @@ impl<'a> Bitreader<'a> {
         for _ in 0..byte_size {
             let byte = self.read_bits(8)?;
             
-            bytes.push(byte)
+            bytes.push(byte as u8)
         }
 
         match String::from_utf8(bytes) {
@@ -58,7 +57,7 @@ impl<'a> Bitreader<'a> {
 
     pub fn read_u8(&mut self) -> Result<u8> {
         let value = self.read_bits(8)?;
-        Ok(value)
+        Ok(value as u8)
     }
 
     pub fn read_u16(&mut self) -> Result<u16> {
@@ -166,7 +165,6 @@ mod tests {
 
     #[test]
     fn read_u32() {
-        // FIXME: Fix Left: Ok(255)
         let input = &[0b11111111, 0b11111111, 0b11111111, 0b11111111];
         let mut bitreader = Bitreader::new(input);
         println!("{}", bitreader.length);
@@ -177,7 +175,6 @@ mod tests {
 
     #[test]
     fn read_u64() {
-        // FIXME: Fix Left: Ok(255)
         let input = &[0b11111111, 0b11111111, 0b11111111, 0b11111111, 0b11111111, 0b11111111, 0b11111111, 0b11111111];
         let mut bitreader = Bitreader::new(input);
 
