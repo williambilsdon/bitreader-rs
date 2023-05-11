@@ -87,8 +87,8 @@ impl<'a> Bitreader<'a> {
     }
 
     pub fn read_f32(&mut self) -> Result<f32> {
-        let value = self.read_u32()?;
-        Ok(value as f32)
+        let value = f32::from_bits(self.read_u32()?);
+        Ok(value)
     }
 
 }
@@ -194,13 +194,12 @@ mod tests {
     }
 
     #[test]
-    #[ignore = "Need to look up binary32 for the implementation"]
     fn read_f32() {
-        let input = &[0b110100, 0b00000000, 0b00000000];
+        let input = &[0b01000000, 0b01100001, 0b01000111, 0b10101110];
         let mut bitreader = Bitreader::new(input);
 
         let result = bitreader.read_f32();
-        let expected: Result<f32> = Ok(52.0);
+        let expected: Result<f32> = Ok(3.52);
         assert_eq!(result, expected) 
     }
     
