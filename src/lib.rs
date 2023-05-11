@@ -17,7 +17,7 @@ impl<'a> Bitreader<'a> {
         }
     }
 
-    // Maybe convert to enum of nums
+    // making result a u64 is more elegant than using an enum for this. 
     fn read_bits(&mut self, size: u8) -> Result<u64> {
         let mut value: u64 = 0;
         let start_pos = self.position;
@@ -154,7 +154,6 @@ mod tests {
 
     #[test]
     fn read_u16() {
-        // FIXME: Fix Left: Ok(255)
         let input = &[0b11111111, 0b11111111];
         let mut bitreader = Bitreader::new(input);
 
@@ -165,7 +164,7 @@ mod tests {
 
     #[test]
     fn read_u32() {
-        let input = &[0b11111111, 0b11111111, 0b11111111, 0b11111111];
+        let input = &[0b01111111, 0b11111111, 0b11111111, 0b11111111];
         let mut bitreader = Bitreader::new(input);
         println!("{}", bitreader.length);
         let result = bitreader.read_u32();
@@ -175,7 +174,7 @@ mod tests {
 
     #[test]
     fn read_u64() {
-        let input = &[0b11111111, 0b11111111, 0b11111111, 0b11111111, 0b11111111, 0b11111111, 0b11111111, 0b11111111];
+        let input = &[0b01111111, 0b11111111, 0b11111111, 0b11111111, 0b11111111, 0b11111111, 0b11111111, 0b11111111];
         let mut bitreader = Bitreader::new(input);
 
         let result = bitreader.read_u64();
