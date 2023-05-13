@@ -69,6 +69,10 @@ impl<'a> Bitreader<'a> {
         let value = self.read_bits(32)?;
         Ok(value as u32)
     }
+    
+    pub fn read_i32(&mut self) -> Result<u32> {
+        !todo!("finish implementation and TDD first")
+    }
 
     pub fn read_u64(&mut self) -> Result<u64> {
         let value = self.read_bits(64)?;
