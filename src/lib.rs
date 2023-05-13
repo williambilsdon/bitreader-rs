@@ -41,7 +41,7 @@ impl<'a> Bitreader<'a> {
         Ok(value)
     }
 
-    pub fn read_string(&mut self, byte_size: u8) -> Result<String> {
+    pub fn read_string(&mut self, byte_size: u64) -> Result<String> {
         let mut bytes: Vec<u8> = vec![];
         for _ in 0..byte_size {
             let byte = self.read_bits(8)?;
