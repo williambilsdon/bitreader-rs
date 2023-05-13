@@ -18,10 +18,10 @@ impl<'a> Bitreader<'a> {
     }
 
     // making result a u64 is more elegant than using an enum for this. 
-    fn read_bits(&mut self, size: u8) -> Result<u64> {
+    fn read_bits(&mut self, size: u64) -> Result<u64> {
         let mut value: u64 = 0;
         let start_pos = self.position;
-        let end_pos = start_pos + size as u64;
+        let end_pos = start_pos + size;
 
         if end_pos > self.length {
             return Err(errors::BitreadError::BufferExceeded)
