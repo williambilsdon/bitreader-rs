@@ -70,8 +70,9 @@ impl<'a> Bitreader<'a> {
         Ok(value as u32)
     }
     
-    pub fn read_i32(&mut self) -> Result<u32> {
-        !todo!("finish implementation and TDD first")
+    pub fn read_i32(&mut self) -> Result<i32> {
+        let value = self.read_bits(32)?;
+        Ok(value as i32)
     }
 
     pub fn read_u64(&mut self) -> Result<u64> {
@@ -213,5 +214,23 @@ mod tests {
         todo!()
     }
 
+    #[test]
+    fn read_i32_negative() {
+        let input = &[0b11111111, 0b11111111, 0b11111111, 0b11111111];
+        let mut bitreader = Bitreader::new(input);
 
+        let result = bitreader.read_i32();
+        let expected: Result<i32> = Ok(-1);
+        assert_eq!(result, expected) 
+    }
+
+    #[test]
+    fn read_i32_positive() {
+        let input = &[0b00000000, 0b00000000, 0b00000000, 0b00000001];
+        let mut bitreader = Bitreader::new(input);
+
+        let result = bitreader.read_i32();
+        let expected: Result<i32> = Ok(1);
+        assert_eq!(result, expected) 
+    }
 }
