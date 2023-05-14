@@ -1,4 +1,4 @@
-mod errors;
+pub mod errors;
 
 type Result<T> = std::result::Result<T, errors::BitreadError>;
 
