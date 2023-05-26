@@ -2,6 +2,7 @@ use crate::errors;
 
 type Result<T> = std::result::Result<T, errors::BitreadError>;
 
+#[derive(Debug)]
 pub struct Bitreader<'a> {
     buffer: &'a [u8],
     position: u64,
@@ -95,6 +96,17 @@ impl<'a> Bitreader<'a> {
         let value = f32::from_bits(self.read_u32()?);
         Ok(value)
     }
+
+    // pub fn read_f32_le(&mut self) -> Result<f32> {
+    //     let mut bytes_vec: Vec<u8> = vec![];
+    //     for i in 0..4 {
+    //         let byte = self.read_u8().unwrap();
+    //         bytes_vec.push(byte)
+    //     }
+
+    //     let bytes_array: [u8; 4] = [bytes_vec[0], bytes_vec[1], bytes_vec[2], bytes_vec[3]];
+    //     Ok(f32::from_le_bytes(bytes_array))
+    // }
 
 }
 
@@ -216,21 +228,21 @@ mod tests {
 
     #[test]
     fn read_i32_negative() {
-        let input = &[0b11111111, 0b11111111, 0b11111111, 0b11111111];
+        let input = &[0b1111_1111, 0b1111_1111, 0b1111_1111, 0b1111_0110];
         let mut bitreader = Bitreader::new(input);
 
         let result = bitreader.read_i32();
-        let expected: Result<i32> = Ok(-1);
+        let expected: Result<i32> = Ok(-10);
         assert_eq!(result, expected) 
     }
 
     #[test]
     fn read_i32_positive() {
-        let input = &[0b00000000, 0b00000000, 0b00000000, 0b00000001];
+        let input = &[0b0000_0000, 0b0000_0000, 0b0000_0000, 0b0000_1010];
         let mut bitreader = Bitreader::new(input);
 
         let result = bitreader.read_i32();
-        let expected: Result<i32> = Ok(1);
+        let expected: Result<i32> = Ok(10);
         assert_eq!(result, expected) 
     }
 }
