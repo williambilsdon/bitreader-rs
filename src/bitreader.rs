@@ -5,7 +5,7 @@ type Result<T> = std::result::Result<T, errors::BitreadError>;
 #[derive(Debug)]
 pub struct Bitreader<'a> {
     buffer: &'a [u8],
-    position: u64,
+    pub position: u64,
     pub length: u64,
 }
 
